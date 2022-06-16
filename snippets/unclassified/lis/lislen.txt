@@ -1,0 +1,12 @@
+fn lis_len(arr: &[i64]) -> usize {
+    let mut table: Vec<i64> = vec![arr[0]];
+    for &v in arr[1..].iter() {
+        let p = table.partition_point(|&x| x < v);
+        if p == table.len() {
+            table.push(v);
+        } else {
+            table[p] = v;
+        }
+    }
+    table.len()
+}
