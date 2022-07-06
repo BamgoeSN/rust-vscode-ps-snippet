@@ -2,18 +2,18 @@ fn main() {
     // FastIO
     use {fastio::*, std::io::*};
     let input_str: &str = get_input();
-    let mut scan: Scanner<_> = Scanner::tokenize(input_str);
+    let mut sc: Scanner<_> = Scanner::tokenize(input_str);
     let stdout = stdout();
-    let out = &mut BufWriter::new(stdout.lock());
+    let wr = &mut BufWriter::new(stdout.lock());
 
     // FastIO Macros
     macro_rules! next {
-        () => { scan.next() };
-        (str) => { scan.next_str() };
-        ($($t:ty) +) => { ($(scan.next::<$t>()),+) };
+        () => { sc.next() };
+        (str) => { sc.next_str() };
+        ($($t:ty) +) => { ($(sc.next::<$t>()),+) };
     }
-    macro_rules! out { ($($arg:tt)*) => { write!(out, $($arg)*).ok(); }; }
-    macro_rules! outln { ($($arg:tt)*) => { writeln!(out, $($arg)*).ok(); }; }
+    macro_rules! out { ($($arg:tt)*) => { write!(wr, $($arg)*).ok(); }; }
+    macro_rules! outln { ($($arg:tt)*) => { writeln!(wr, $($arg)*).ok(); }; }
 
     // Main
 }
