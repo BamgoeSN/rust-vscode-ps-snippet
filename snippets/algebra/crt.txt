@@ -1,30 +1,15 @@
 // Chinese remainder theorem
-//
-// Reference: PyRival <https://github.com/cheran-senthil/PyRival/blob/master/pyrival/algebra/chinese_remainder.py>
+// Reference: PyRival https://github.com/cheran-senthil/PyRival/blob/master/pyrival/algebra/chinese_remainder.py
 
-#[inline(always)]
-fn safe_mod(mut x: i64, m: i64) -> i64 {
-    x %= m;
-    if x < 0 {
-        x + m
-    } else {
+fn gcd(x: i64, y: i64) -> i64 {
+    if y == 0 {
         x
+    } else {
+        gcd(y, x % y)
     }
 }
 
-/// Returns the greatest common divisor of a and b
-/// Using loop based impl for inlining
-#[inline(always)]
-fn gcd(mut a: i64, mut b: i64) -> i64 {
-    while b != 0 {
-        let t = b;
-        b = a % b;
-        a = t;
-    }
-    a
-}
-
-/// Returns gcd(a, b), s, r s.t. a*s + b*r = gcd(a, b)
+/// Returns gcd(a, b), s, t s.t. a*s + b*t = gcd(a, b)
 #[inline(always)]
 fn ext_gcd(a: i64, b: i64) -> (i64, i64, i64) {
     let (mut s, mut old_s) = (0, 1);
@@ -45,16 +30,16 @@ fn ext_gcd(a: i64, b: i64) -> (i64, i64, i64) {
     )
 }
 
-/// Returns $x$ s.t. $x=r_i (mod m_i)$ for all $i$
+/// Returns x s.t. x=r_i (mod m_i) for all i
 fn crt(r: &[i64], m: &[i64]) -> Option<i64> {
     let (mut x, mut m_prod) = (0, 1);
     for (bi, mi) in r.iter().zip(m.iter()) {
         let (g, s, _) = ext_gcd(m_prod, *mi);
-        if safe_mod((bi - x) % mi, g) != 0 {
+        if ((bi - x) % mi).rem_euclid(g) != 0 {
             return None;
         }
-        x += m_prod * (s * safe_mod(bi - x, *mi) / g);
-        m_prod = (m_prod * mi) / gcd(m_prod, *mi);
+        x += m_prod * ((s * ((bi - x).rem_euclid(*mi))).div_euclid(g));
+        m_prod = (m_prod * mi).div_euclid(gcd(m_prod, *mi));
     }
-    Some(safe_mod(x, m_prod))
+    Some(x.rem_euclid(m_prod))
 }

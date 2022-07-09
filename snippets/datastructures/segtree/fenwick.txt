@@ -1,13 +1,13 @@
-struct Fenwick<T: ZeroOne + std::ops::AddAssign + std::ops::Sub<Output = T>> {
+struct Fenwick<T> {
     n: usize,
     data: Vec<T>,
 }
 
-impl<T: ZeroOne + std::ops::AddAssign + std::ops::Sub<Output = T>> Fenwick<T> {
+impl<T: Copy + From<i8> + std::ops::AddAssign + std::ops::Sub<Output = T>> Fenwick<T> {
     fn new(n: usize) -> Self {
         Self {
             n,
-            data: vec![T::zero(); n],
+            data: vec![0.into(); n],
         }
     }
 
@@ -19,12 +19,16 @@ impl<T: ZeroOne + std::ops::AddAssign + std::ops::Sub<Output = T>> Fenwick<T> {
         }
     }
 
+    fn get(&self, idx: usize) -> T {
+        self.sum(idx, idx + 1)
+    }
+
     fn sum(&self, l: usize, r: usize) -> T {
         self.inner_sum(r) - self.inner_sum(l)
     }
 
     fn inner_sum(&self, mut r: usize) -> T {
-        let mut s: T = T::zero();
+        let mut s: T = 0.into();
         while r > 0 {
             s += self.data[r - 1];
             r -= r & (!r + 1);

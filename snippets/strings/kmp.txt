@@ -1,0 +1,64 @@
+struct KMPNeedle<'a, T: PartialEq> {
+    p: &'a [T],
+    c: Vec<usize>,
+}
+
+impl<'a, T: PartialEq> KMPNeedle<'a, T> {
+    fn new(p: &'a [T]) -> Self {
+        let mut c: Vec<usize> = vec![0; p.len() + 1];
+
+        let mut l = 0;
+        for (r, v) in p.iter().enumerate().skip(1) {
+            while l > 0 && p[l] != *v {
+                l = c[l];
+            }
+            if p[l] == *v {
+                c[r + 1] = l + 1;
+                l += 1;
+            }
+        }
+
+        Self { p, c }
+    }
+}
+
+struct KMPMatcher<'a, 'b: 'a, 'c: 'b, T: PartialEq> {
+    needle: &'c KMPNeedle<'b, T>,
+    t: &'a [T],
+    i: usize,
+    j: usize,
+}
+
+impl<'a, 'b: 'a, 'c: 'b, T: PartialEq> KMPMatcher<'a, 'b, 'c, T> {
+    fn new(needle: &'c KMPNeedle<'b, T>, t: &'a [T]) -> Self {
+        Self {
+            needle,
+            t,
+            i: 0,
+            j: 0,
+        }
+    }
+}
+
+impl<'a, 'b: 'a, 'c: 'b, T: PartialEq> Iterator for KMPMatcher<'a, 'b, 'c, T> {
+    type Item = usize;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        while self.i < self.t.len() {
+            while self.j > 0 && self.t[self.i] != self.needle.p[self.j] {
+                self.j = self.needle.c[self.j];
+            }
+            if self.t[self.i] == self.needle.p[self.j] {
+                if self.j == self.needle.p.len() - 1 {
+                    self.j = self.needle.c[self.j + 1];
+                    self.i += 1;
+                    return Some(self.i - self.needle.p.len());
+                } else {
+                    self.j += 1;
+                }
+            }
+            self.i += 1;
+        }
+        None
+    }
+}

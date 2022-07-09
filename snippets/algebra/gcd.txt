@@ -1,7 +1,11 @@
-fn gcd(x: u64, y: u64) -> u64 {
-    if y == 0 {
+fn gcd<T>(x: T, y: T) -> T
+where
+    T: Copy + PartialEq + PartialOrd + std::ops::Rem<Output = T> + From<u8>,
+{
+    if y == 0.into() {
         x
     } else {
-        gcd(y, x % y)
+        let v = x % y;
+        gcd(y, v)
     }
 }
