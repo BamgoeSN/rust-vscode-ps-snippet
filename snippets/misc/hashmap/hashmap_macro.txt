@@ -1,17 +1,14 @@
-pub trait ZeroOne: Sized + Copy {
-    fn zero() -> Self;
-    fn one() -> Self;
+macro_rules! count_tts {
+    () => { 0 };
+    ($odd:tt $($a:tt $b:tt)*) => { (count_tts!($($a)*) << 1) | 1 };
+    ($($a:tt $even:tt)*) => { count_tts!($($a)*) << 1 };
 }
 
-macro_rules! impl_zero_one {
-    ($($ty:ty) *) => { $(
-        impl ZeroOne for $ty {
-            #[inline(always)]
-            fn one() -> Self {1}
-            #[inline(always)]
-            fn zero() -> Self {0}
-        }
-    )+ };
+// let map: HashMap<i64, i64> = hashmap![1,1; 2,2; 3,3];
+macro_rules! hashmap {
+    ($($k:expr,$v:expr);*) => {{
+        let mut map = HashMap::with_capacity(count_tts![$($k )*]);
+        $( map.insert($k, $v); )*
+        map
+    }}
 }
-
-impl_zero_one!(isize i8 i16 i32 i64 i128 usize u8 u16 u32 u64 u128);
