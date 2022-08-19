@@ -1,7 +1,7 @@
 fn main() {
     // FastIO
     use {fastio::*, std::io::*};
-    let input_str: &str = get_input();
+    let input_str = get_input();
     let mut sc: Splitter<_> = Splitter::new(input_str, |s| s.split_ascii_whitespace());
     let stdout = stdout();
     let wr = &mut BufWriter::new(stdout.lock());
