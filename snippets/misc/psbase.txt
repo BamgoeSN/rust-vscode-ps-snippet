@@ -2,14 +2,13 @@ fn main() {
     // FastIO
     use {fastio::*, std::io::*};
     let input_str: &str = get_input();
-    let mut sc: Scanner<_> = Scanner::tokenize(input_str);
+    let mut sc: Splitter<_> = Splitter::new(input_str, |s| s.split_ascii_whitespace());
     let stdout = stdout();
     let wr = &mut BufWriter::new(stdout.lock());
 
     // FastIO Macros
     macro_rules! next {
         () => { sc.next() };
-        (str) => { sc.next_str() };
         ($($t:ty) +) => { ($(sc.next::<$t>()),+) };
     }
     macro_rules! out { ($($arg:tt)*) => { write!(wr, $($arg)*).ok(); }; }
@@ -19,6 +18,8 @@ fn main() {
 }
 
 mod fastio {
+    use std::{slice::*, str::*};
+
     extern "C" {
         fn mmap(addr: usize, len: usize, p: i32, f: i32, fd: i32, o: i64) -> *mut u8;
         fn fstat(fd: i32, stat: *mut usize) -> i32;
@@ -28,42 +29,30 @@ mod fastio {
         let mut stat = [0; 20];
         unsafe { fstat(0, (&mut stat).as_mut_ptr()) };
         let buffer = unsafe { mmap(0, stat[6], 1, 2, 0, 0) };
-        unsafe { std::str::from_utf8_unchecked(std::slice::from_raw_parts(buffer, stat[6])) }
+        unsafe { from_utf8_unchecked(from_raw_parts(buffer, stat[6])) }
     }
 
-    pub struct Scanner<'a, I: Iterator<Item = &'a str>> {
+    pub struct Splitter<I: Iterator> {
         it: I,
     }
 
-    impl<'a> Scanner<'a, std::str::SplitAsciiWhitespace<'a>> {
-        pub fn tokenize(s: &'a str) -> Self {
-            Self {
-                it: s.split_ascii_whitespace(),
-            }
+    impl<'a, 'b: 'a, T: Iterator> Splitter<T> {
+        pub fn new(s: &'b str, split: impl FnOnce(&'a str) -> T) -> Self {
+            Self { it: split(s) }
         }
     }
 
-    impl<'a> Scanner<'a, std::str::Lines<'a>> {
-        pub fn lines(s: &'a str) -> Self {
-            Self { it: s.lines() }
-        }
-    }
-
-    impl<'a, I: Iterator<Item = &'a str>> Scanner<'a, I> {
-        #[inline(always)]
-        pub fn next<T: std::str::FromStr>(&mut self) -> T {
+    impl<'a, I: Iterator<Item = &'a str>> Splitter<I> {
+        pub fn next<T: FromStr>(&mut self) -> T {
             self.it.next().unwrap().parse().ok().unwrap()
         }
-        #[inline(always)]
         pub fn next_str(&mut self) -> &'a str {
             self.it.next().unwrap()
         }
-        #[inline(always)]
-        pub fn next_option<T: std::str::FromStr>(&mut self) -> Option<T> {
+        pub fn next_opt<T: FromStr>(&mut self) -> Option<T> {
             self.it.next().and_then(|s| s.parse().ok())
         }
-        #[inline(always)]
-        pub fn next_str_option(&mut self) -> Option<&'a str> {
+        pub fn next_str_opt(&mut self) -> Option<&'a str> {
             self.it.next()
         }
     }
