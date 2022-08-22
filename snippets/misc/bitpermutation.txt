@@ -1,0 +1,9 @@
+fn bit_permutation(bitcnt: u32, maxbit: u32) -> impl Iterator<Item = u64> {
+    let x = std::iter::successors(Some((1u64 << bitcnt) - 1), |&v| {
+        let t = v | (v - 1);
+        let u = (t + 1) | ((((!t) & (t + 1)) - 1) >> (v.trailing_zeros() + 1));
+        Some(u)
+    })
+    .take_while(move |&x| x < (1 << maxbit));
+    x
+}
