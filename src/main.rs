@@ -38,23 +38,23 @@ fn generate_snippet(name: &str, code: &str) -> Value {
     let lines: Vec<String> = code
         .lines()
         .map(|s| {
-            let mut buf = String::new();
             let char_vec: Vec<char> = s.chars().collect();
-            for (i, &c) in char_vec.iter().enumerate() {
-                if c == '$' {
-                    if i == char_vec.len() - 1 {
-                        buf.push('$');
+            let buf: String = s
+                .char_indices()
+                .map(|(i, c)| {
+                    if c == '$' {
+                        char_vec.get(i + 1).map_or("$".to_string(), |&d| {
+                            if d.is_alphanumeric() {
+                                "\\$".to_string()
+                            } else {
+                                "$".to_string()
+                            }
+                        })
                     } else {
-                        if char_vec[i + 1].is_alphanumeric() {
-                            buf.push_str("$$");
-                        } else {
-                            buf.push('$');
-                        }
+                        c.to_string()
                     }
-                } else {
-                    buf.push(c);
-                }
-            }
+                })
+                .collect();
             buf
         })
         .collect();
