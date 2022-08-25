@@ -17,12 +17,12 @@ mod bigint {
             let mut carry: i64 = 0;
             for i in 0..$uint.0.len() {
                 $uint.0[i] += carry;
-                carry = $uint.0[i] / TENS;
+                carry = $uint.0[i].div_euclid(TENS);
                 $uint.0[i] -= carry * TENS;
             }
             while carry != 0 {
-                $uint.0.push(carry % TENS);
-                carry /= TENS;
+                $uint.0.push(carry.rem_euclid(TENS));
+                carry = carry.div_euclid(TENS);
             }
             while let Some(&x) = $uint.0.last() {
                 if x != 0 {
