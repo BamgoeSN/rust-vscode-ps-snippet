@@ -1,0 +1,65 @@
+#![no_main]
+
+#[no_mangle]
+unsafe fn main() -> i32 {
+    // FastIO
+    use {fastio::*, std::io::*};
+    let input_str = get_input();
+    let mut sc: Splitter<_> = Splitter::new(input_str, |s| s.split_ascii_whitespace());
+    let stdout = stdout();
+    let wr = &mut BufWriter::new(stdout.lock());
+
+    // FastIO Macros
+    macro_rules! next {
+        () => { sc.next() };
+        ($($t:ty) +) => { ($(sc.next::<$t>()),+) };
+    }
+    macro_rules! out { ($($arg:tt)*) => { write!(wr, $($arg)*).ok(); }; }
+    macro_rules! outln { ($($arg:tt)*) => { writeln!(wr, $($arg)*).ok(); }; }
+
+    // Main
+
+    0
+}
+
+mod fastio {
+    use std::{slice::*, str::*};
+
+    #[link(name = "c")]
+    extern "C" {
+        fn mmap(addr: usize, len: usize, p: i32, f: i32, fd: i32, o: i64) -> *mut u8;
+        fn fstat(fd: i32, stat: *mut usize) -> i32;
+    }
+
+    pub fn get_input() -> &'static str {
+        let mut stat = [0; 20];
+        unsafe { fstat(0, (&mut stat).as_mut_ptr()) };
+        let buffer = unsafe { mmap(0, stat[6], 1, 2, 0, 0) };
+        unsafe { from_utf8_unchecked(from_raw_parts(buffer, stat[6])) }
+    }
+
+    pub struct Splitter<I: Iterator> {
+        it: I,
+    }
+
+    impl<'a, 'b: 'a, T: Iterator> Splitter<T> {
+        pub fn new(s: &'b str, split: impl FnOnce(&'a str) -> T) -> Self {
+            Self { it: split(s) }
+        }
+    }
+
+    impl<'a, I: Iterator<Item = &'a str>> Splitter<I> {
+        pub fn next<T: FromStr>(&mut self) -> T {
+            self.it.next().unwrap().parse().ok().unwrap()
+        }
+        pub fn next_str(&mut self) -> &'a str {
+            self.it.next().unwrap()
+        }
+        pub fn next_opt<T: FromStr>(&mut self) -> Option<T> {
+            self.it.next().and_then(|s| s.parse().ok())
+        }
+        pub fn next_str_opt(&mut self) -> Option<&'a str> {
+            self.it.next()
+        }
+    }
+}
