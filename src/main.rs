@@ -53,7 +53,6 @@ fn generate_snippet(name: &str, code: &str) -> Value {
                             }
                         })
                         .unwrap_or_else(|| buf.push('$')),
-                    '\t' => buf.extend(c.escape_default()),
                     _ => buf.push(c),
                 }
             }
@@ -75,8 +74,7 @@ fn get_all_files(path: &str) -> Vec<String> {
 fn file_dfs(entry: fs::ReadDir, files: &mut Vec<String>) {
     for path in entry.map(|p| p.unwrap()) {
         if path.file_type().unwrap().is_dir() {
-            let s = path.path().to_str().unwrap().to_owned();
-            file_dfs(fs::read_dir(&s).unwrap(), files);
+            file_dfs(fs::read_dir(path.path().to_str().unwrap()).unwrap(), files);
         } else {
             files.push(path.path().to_str().unwrap().to_owned());
         }
