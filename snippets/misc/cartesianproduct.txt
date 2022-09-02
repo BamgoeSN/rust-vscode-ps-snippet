@@ -1,0 +1,8 @@
+fn cart_prod<I, J, S, T>(a: I, b: J) -> impl Iterator<Item = (S, T)>
+where
+    I: Iterator<Item = S>,
+    J: Iterator<Item = T> + Clone,
+    S: Clone,
+{
+    a.flat_map(move |a| b.clone().map(move |b| (a.clone(), b)))
+}
