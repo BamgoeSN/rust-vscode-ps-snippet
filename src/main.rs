@@ -18,7 +18,11 @@ fn main() {
     let files = get_all_files("./snippets");
 
     for path in files.iter() {
-        let name = path.rsplit_once("/").unwrap().1.strip_suffix(".txt");
+        let name = path
+            .rsplit_once(std::path::MAIN_SEPARATOR)
+            .unwrap()
+            .1
+            .strip_suffix(".txt");
         match name {
             None => continue,
             Some(name) => {
