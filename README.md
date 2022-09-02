@@ -18,5 +18,5 @@ The generator searches through `snippets/` folder which is in the same directory
 
 The title of each snippet will be used for its prefix, so make sure that none of them have duplicated file names.
 
-## Limits
+## Limitations
 Current implementation of handling escape `$` sign is to check if either alphabetic character follows after it, or the line terminates with it, and if so then replace it with `\\$` to make the sign literal dollar sign. In any other cases, the `$` will not be escaped and therefore used as a preset cursor for the snippet. In other words, any literal dollar signs included like `$0` or `${0:here}` will not be escaped, where the terminating `$` and strings like `$abc` will be escaped. This implementation is to cope with macro definition in Rust, but it isn't considering any other cases for other languages. To my knowledge, there may be an issue with dealing with PHP snippets, so keep this in mind.
