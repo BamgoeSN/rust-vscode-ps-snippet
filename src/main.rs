@@ -45,7 +45,7 @@ fn generate_snippet(name: &str, code: &str) -> Value {
                     '$' => chars
                         .peek()
                         .and_then(|&d| {
-                            if d.is_alphanumeric() {
+                            if d.is_alphabetic() {
                                 buf.push_str(r"\$");
                                 Some(())
                             } else {
