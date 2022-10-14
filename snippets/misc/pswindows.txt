@@ -29,9 +29,6 @@ mod fastio {
         str::*,
     };
 
-    #[link(name = "c")]
-    extern "C" {}
-
     pub fn get_input() -> String {
         let mut buf = String::new();
         stdin().read_to_string(&mut buf).unwrap();
