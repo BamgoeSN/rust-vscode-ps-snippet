@@ -1,9 +1,9 @@
 fn isqrt<T>(s: T) -> T
 where
     T: Copy
-        + std::ops::Shr<Output = T>
-        + std::ops::Add<Output = T>
-        + std::ops::Div<Output = T>
+        + core::ops::Shr<Output = T>
+        + core::ops::Add<Output = T>
+        + core::ops::Div<Output = T>
         + PartialOrd
         + From<u8>,
 {

@@ -1,4 +1,4 @@
-trait PollardRho: MillerRabin + std::ops::ShrAssign + std::ops::BitAnd<Output = Self> + Clone {
+trait PollardRho: MillerRabin + core::ops::ShrAssign + core::ops::BitAnd<Output = Self> + Clone {
     fn rho(self, arr: &mut Vec<Self>, rng: &mut rng::RNG);
     fn factorize(mut self, rng: &mut rng::RNG) -> Vec<Self> {
         let mut arr: Vec<Self> = Vec::new();
@@ -159,7 +159,7 @@ impl_millerrabin!(u64, u128, 300000, 2, 325, 9375, 28178, 450775, 9780504, 17952
 
 pub fn gcd<T>(x: T, y: T) -> T
 where
-    T: Copy + PartialEq + PartialOrd + std::ops::Rem<Output = T> + From<u8>,
+    T: Copy + PartialEq + PartialOrd + core::ops::Rem<Output = T> + From<u8>,
 {
     if y == 0.into() {
         x

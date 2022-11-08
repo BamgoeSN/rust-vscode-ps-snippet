@@ -7,7 +7,7 @@ impl<T> Matrix<T> {
     }
 }
 
-impl<T> std::ops::Index<usize> for Matrix<T> {
+impl<T> core::ops::Index<usize> for Matrix<T> {
     type Output = [T];
 
     fn index(&self, i: usize) -> &Self::Output {
@@ -15,7 +15,7 @@ impl<T> std::ops::Index<usize> for Matrix<T> {
     }
 }
 
-impl<T> std::ops::IndexMut<usize> for Matrix<T> {
+impl<T> core::ops::IndexMut<usize> for Matrix<T> {
     fn index_mut(&mut self, i: usize) -> &mut Self::Output {
         &mut self.0[self.1 * i..self.1 * (i + 1)]
     }

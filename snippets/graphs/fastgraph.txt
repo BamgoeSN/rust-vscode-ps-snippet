@@ -15,7 +15,7 @@ impl<T> Graph<T> {
     }
 
     fn add_edge(&mut self, from: usize, to: usize, data: T) {
-        let prev = std::mem::replace(&mut self.first[from], self.edge.len());
+        let prev = core::mem::replace(&mut self.first[from], self.edge.len());
         self.edge.push((to, prev, data));
     }
 

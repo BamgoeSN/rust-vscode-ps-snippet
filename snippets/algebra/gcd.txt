@@ -1,6 +1,6 @@
 fn gcd<T>(x: T, y: T) -> T
 where
-    T: Copy + PartialEq + PartialOrd + std::ops::Rem<Output = T> + From<u8>,
+    T: Copy + PartialEq + PartialOrd + core::ops::Rem<Output = T> + From<u8>,
 {
     if y == 0.into() {
         x

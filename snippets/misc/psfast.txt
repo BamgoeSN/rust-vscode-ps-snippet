@@ -24,7 +24,7 @@ fn main() -> i32 {
 }
 
 mod fastio {
-    use std::{slice::*, str::*};
+    use core::{slice::*, str::*};
 
     #[link(name = "c")]
     extern "C" {

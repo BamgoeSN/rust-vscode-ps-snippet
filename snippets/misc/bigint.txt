@@ -1,5 +1,5 @@
 mod bigint {
-    use std::{
+    use core::{
         fmt::Display,
         num::ParseIntError,
         ops::{Add, AddAssign, Mul, MulAssign, Sub, SubAssign},
@@ -68,7 +68,7 @@ mod bigint {
     }
 
     impl Display for Uint {
-        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
             write!(f, "{}", *self.0.last().unwrap_or(&0))?;
             for &v in self.0.iter().rev().skip(1) {
                 write!(f, "{:0CHUNK$}", v)?;
@@ -78,8 +78,8 @@ mod bigint {
     }
 
     impl PartialOrd for Uint {
-        fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-            use std::cmp::Ordering;
+        fn partial_cmp(&self, other: &Self) -> Option<core::cmp::Ordering> {
+            use core::cmp::Ordering;
             match self.0.len().cmp(&other.0.len()) {
                 Ordering::Equal => {
                     for i in (0..self.0.len()).rev() {
@@ -96,8 +96,8 @@ mod bigint {
     }
 
     impl Ord for Uint {
-        fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-            use std::cmp::Ordering;
+        fn cmp(&self, other: &Self) -> core::cmp::Ordering {
+            use core::cmp::Ordering;
             match self.0.len().cmp(&other.0.len()) {
                 Ordering::Equal => {
                     for i in (0..self.0.len()).rev() {
@@ -177,7 +177,7 @@ mod bigint {
                     .0
                     .iter()
                     .copied()
-                    .chain(std::iter::repeat(0))
+                    .chain(core::iter::repeat(0))
                     .take(max_2len)
                     .collect();
 
@@ -185,7 +185,7 @@ mod bigint {
                     .0
                     .iter()
                     .copied()
-                    .chain(std::iter::repeat(0))
+                    .chain(core::iter::repeat(0))
                     .take(max_2len)
                     .collect();
 
@@ -324,7 +324,7 @@ mod bigint {
                     #[inline(always)]
                     fn rem_pow(mut base: u64, exp: u64) -> u64 {
                         let mut result = 1u64;
-                        for exp in std::iter::successors(Some(exp), |x| Some(x >> 1))
+                        for exp in core::iter::successors(Some(exp), |x| Some(x >> 1))
                             .take_while(|&v| v != 0)
                         {
                             if exp & 1 != 0 {
@@ -484,7 +484,7 @@ mod bigint {
     }
 
     impl Display for Int {
-        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
             if let Neg = self.sign {
                 write!(f, "-")?;
             }
@@ -493,8 +493,8 @@ mod bigint {
     }
 
     impl PartialOrd for Int {
-        fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-            use std::cmp::Ordering;
+        fn partial_cmp(&self, other: &Self) -> Option<core::cmp::Ordering> {
+            use core::cmp::Ordering;
             match (self.sign, other.sign) {
                 (Neg, Neg) => other.nat.partial_cmp(&self.nat),
                 (Neg, Pos) => Some(Ordering::Less),
@@ -505,8 +505,8 @@ mod bigint {
     }
 
     impl Ord for Int {
-        fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-            use std::cmp::Ordering;
+        fn cmp(&self, other: &Self) -> core::cmp::Ordering {
+            use core::cmp::Ordering;
             match (self.sign, other.sign) {
                 (Neg, Neg) => other.nat.cmp(&self.nat),
                 (Neg, Pos) => Ordering::Less,

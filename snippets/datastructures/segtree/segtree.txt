@@ -1,4 +1,4 @@
-use std::ops::Index;
+use core::ops::Index;
 
 fn ceil_pow2(n: usize) -> usize {
     let mut x: usize = 0;

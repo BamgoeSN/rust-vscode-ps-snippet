@@ -1,8 +1,9 @@
-fn dijkstra<T: Copy + From<u8> + std::ops::Add<Output = T> + Eq + Ord>(
+fn dijkstra<T: Copy + From<u8> + core::ops::Add<Output = T> + Eq + Ord>(
     graph: &Graph<T>,
     src: usize,
 ) -> Vec<Option<T>> {
-    use std::{cmp::Reverse, collections::BinaryHeap};
+    use core::cmp::Reverse;
+    use std::collections::BinaryHeap;
     let mut dist: Vec<Option<T>> = vec![None; graph.n];
     let mut heap: BinaryHeap<(Reverse<T>, usize)> = BinaryHeap::new();
     heap.push((Reverse(0.into()), src));

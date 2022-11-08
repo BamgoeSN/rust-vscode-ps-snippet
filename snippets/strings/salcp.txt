@@ -63,7 +63,7 @@ fn suffix_array<T: Ord>(s: &[T]) -> Vec<usize> {
         for i in 1..n {
             nr[sa[i]] = nr[sa[i - 1]] + if key!(sa[i - 1]) < key!(sa[i]) { 1 } else { 0 };
         }
-        std::mem::swap(&mut r, &mut nr);
+        core::mem::swap(&mut r, &mut nr);
 
         if r[sa[n - 1]] == n {
             break;

@@ -37,8 +37,8 @@ fn get_turn(v1: &Point, v2: &Point) -> Turn {
     }
 }
 
-fn compare_ccw(a: &Point, b: &Point) -> std::cmp::Ordering {
-    use std::cmp::Ordering;
+fn compare_ccw(a: &Point, b: &Point) -> core::cmp::Ordering {
+    use core::cmp::Ordering;
     if a == b {
         return Ordering::Equal;
     }

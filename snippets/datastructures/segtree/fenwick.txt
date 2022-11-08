@@ -3,7 +3,7 @@ struct Fenwick<T> {
     data: Vec<T>,
 }
 
-impl<T: Copy + From<i8> + std::ops::AddAssign + std::ops::Sub<Output = T>> Fenwick<T> {
+impl<T: Copy + From<i8> + core::ops::AddAssign + core::ops::Sub<Output = T>> Fenwick<T> {
     fn new(n: usize) -> Self {
         Self {
             n,
