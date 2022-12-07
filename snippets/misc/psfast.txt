@@ -1,9 +1,10 @@
 #![no_main]
+use std::io::*;
 
 #[no_mangle]
 fn main() -> i32 {
     // FastIO
-    use {fastio::*, std::io::*};
+    use fastio::*;
     let input_str = get_input();
     let mut sc: Splitter<_> = Splitter::new(input_str, |s| s.split_ascii_whitespace());
     let stdout = stdout();
