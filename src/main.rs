@@ -1,6 +1,7 @@
 use std::{
     fs::{self, File},
-    io::{Read, Write},
+    io::{self, Read, Write},
+    path,
 };
 
 use serde::{Deserialize, Serialize};
@@ -12,27 +13,21 @@ struct Content {
     body: Vec<String>,
 }
 
-fn main() {
+fn main() -> io::Result<()> {
     let mut snippet = Map::new();
+    let files = get_all_files("./snippets")?;
 
-    let files = get_all_files("./snippets");
-
-    for path in files.iter() {
-        let name = path
-            .rsplit_once(std::path::MAIN_SEPARATOR)
-            .unwrap()
-            .1
-            .strip_suffix(".txt");
-        if let Some(name) = name {
-            let mut fp = File::open(path).unwrap();
-            let mut code = String::new();
-            fp.read_to_string(&mut code).unwrap();
-            snippet.insert(name.to_string(), generate_snippet(name, &code));
-        }
+    for (name, mut fp) in files.into_iter() {
+        let mut code = String::new();
+        fp.read_to_string(&mut code).unwrap();
+        let val = generate_snippet(&name, &code);
+        snippet.insert(name, val);
     }
 
     let mut output = File::create("output.txt").unwrap();
     write!(output, "{}", serde_json::to_string(&snippet).unwrap()).unwrap();
+
+    Ok(())
 }
 
 fn generate_snippet(name: &str, code: &str) -> Value {
@@ -66,20 +61,33 @@ fn generate_snippet(name: &str, code: &str) -> Value {
     })
 }
 
-fn get_all_files(path: &str) -> Vec<String> {
-    let mut files: Vec<String> = Vec::new();
-    file_dfs(fs::read_dir(path).unwrap(), &mut files);
-    files
+fn get_all_files(path: impl AsRef<path::Path>) -> io::Result<Vec<(String, File)>> {
+    let mut files = vec![];
+    let entry = fs::read_dir(path)?;
+    file_dfs(entry, &mut files)?;
+    Ok(files)
 }
 
-fn file_dfs(entry: fs::ReadDir, files: &mut Vec<String>) {
-    for path in entry.map(|p| p.unwrap()) {
-        if path.file_type().unwrap().is_dir() {
-            file_dfs(fs::read_dir(path.path().to_str().unwrap()).unwrap(), files);
+fn file_dfs(entry: fs::ReadDir, files: &mut Vec<(String, File)>) -> io::Result<()> {
+    for path in entry {
+        let path = path?;
+        let pname = path.path();
+        if path.file_type()?.is_dir() {
+            file_dfs(
+                fs::read_dir(pname.to_str().ok_or_else(invalid_encoding)?)?,
+                files,
+            )?;
         } else {
-            files.push(path.path().to_str().unwrap().to_owned());
+            let fname = pname.to_str().ok_or_else(invalid_encoding)?.to_owned();
+            let file = File::open(fname.as_str())?;
+            files.push((fname, file));
         }
     }
+    Ok(())
+}
+
+fn invalid_encoding() -> io::Error {
+    io::Error::new(io::ErrorKind::InvalidData, "Invalid encoding of file path")
 }
 
 #[cfg(test)]
