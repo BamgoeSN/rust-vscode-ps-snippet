@@ -14,10 +14,10 @@ git clone https://github.com/BamgoeSN/rust-vscode-ps-snippet.git
 Then, move into the generated directory.
 
 ### Using contained snippets (for Rust)
-If you're using Rust for competitive programming and you're going to use snippets in the `snippets/` directory, then simply run `cargo run --release`. The program will search through every `.txt` text files in `snippets/`, include them in snippet, and generate `output.txt` file containing json data for VSCode snippet settings. After the run, open up snippets setting for Rust, and overwrite the content in `output.txt` into the settings file.
+If you're using Rust for competitive programming and you're going to use snippets in the `snippets/` directory, then simply run `cargo run --release`. The program will search through every `.txt` text files in `snippets/`, include them in snippet, and print out the json content to stdout. This output can be put into the VSCode snippet settings file.
 
 ### Using custom snippets
-The generator searches through `snippets/` folder which is in the same directory with the generator project, finds every `.txt` files in it, convert them into json data for VSCode settings and combine them into `output.txt` file. No matter what the inner folder structure inside `snippets/` is, it will just search out every text files and generate a settings file. So, simply replace the contents in `snippets/` and run the generator to get your own snippets settings.
+The generator searches through `snippets/` folder which is in the same directory with the generator project, finds every `.txt` files in it, convert them into json data for VSCode settings, combine them and print it out into stdout. No matter what the inner folder structure inside `snippets/` is, it will just search out every text files and print it out. So, simply replace the contents in `snippets/` and run the generator to get your own snippets settings.
 
 The title of each snippet will be used for its prefix, so **make sure that none of them have identical file names.**
 
