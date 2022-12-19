@@ -37,24 +37,21 @@ fn generate_snippet(name: &str, code: &str) -> Value {
             let mut chars = s.chars().peekable();
             let mut buf = String::new();
             while let Some(c) = chars.next() {
-                match c {
-                    '$' => chars
-                        .peek()
-                        .and_then(|&d| {
-                            if d.is_alphabetic() {
-                                buf.push_str(r"\$");
-                                Some(())
-                            } else {
-                                None
-                            }
-                        })
-                        .unwrap_or_else(|| buf.push('$')),
-                    _ => buf.push(c),
+                if c == '$' {
+                    let check = chars.peek().map(|&d| d.is_alphabetic());
+                    if check == Some(true) {
+                        buf.push_str(r"\$");
+                    } else {
+                        buf.push('$');
+                    }
+                } else {
+                    buf.push(c)
                 }
             }
             buf
         })
         .collect();
+
     json!({
         "prefix": name,
         "body": lines,
