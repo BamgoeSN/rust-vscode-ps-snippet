@@ -24,8 +24,7 @@ fn main() -> io::Result<()> {
         snippet.insert(name, val);
     }
 
-    let mut output = File::create("output.txt").unwrap();
-    write!(output, "{}", serde_json::to_string(&snippet).unwrap()).unwrap();
+    println!("{}", serde_json::to_string(&snippet)?);
 
     Ok(())
 }
