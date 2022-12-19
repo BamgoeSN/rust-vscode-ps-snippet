@@ -23,14 +23,11 @@ fn main() {
             .unwrap()
             .1
             .strip_suffix(".txt");
-        match name {
-            None => continue,
-            Some(name) => {
-                let mut fp = File::open(path).unwrap();
-                let mut code = String::new();
-                fp.read_to_string(&mut code).unwrap();
-                snippet.insert(name.to_string(), generate_snippet(name, &code));
-            }
+        if let Some(name) = name {
+            let mut fp = File::open(path).unwrap();
+            let mut code = String::new();
+            fp.read_to_string(&mut code).unwrap();
+            snippet.insert(name.to_string(), generate_snippet(name, &code));
         }
     }
 
