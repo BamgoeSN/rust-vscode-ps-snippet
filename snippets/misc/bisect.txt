@@ -1,0 +1,16 @@
+fn partition_point<T>(arr: &[T], mut pred: impl FnMut(&T) -> bool) -> usize {
+    if !pred(&arr[0]) {
+        return 0;
+    }
+    let (mut l, mut r) = (0, arr.len());
+    while l + 1 < r {
+        let m = (l + r) / 2;
+        if pred(&arr[m]) {
+            l = m;
+        } else {
+            r = m;
+        }
+    }
+    r
+}
+
