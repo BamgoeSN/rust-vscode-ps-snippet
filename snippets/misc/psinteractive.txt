@@ -1,0 +1,71 @@
+use std::io::*;
+
+fn main() {
+    // Interactive IO
+    use interactive::*;
+    let inp = stdin();
+    let mut sc = Scanner::new(BufReader::new(inp.lock()));
+    let out = stdout();
+    let mut wr = BufWriter::new(BufWriter::new(out.lock()));
+
+    // IO Macros
+    macro_rules! out { ($($arg:tt)*) => { write!(wr, $($arg)*).ok(); }; }
+    macro_rules! outln { ($($arg:tt)*) => { writeln!(wr, $($arg)*).ok(); }; }
+
+    // Main
+}
+
+mod interactive {
+    use std::{io::*, str::*};
+
+    pub struct Scanner<R> {
+        reader: R,
+        buffer: Vec<String>,
+        sbuf: String,
+    }
+
+    impl<R> Scanner<R>
+    where
+        R: BufRead,
+    {
+        pub fn new(reader: R) -> Self {
+            Self {
+                reader,
+                buffer: vec![],
+                sbuf: String::new(),
+            }
+        }
+
+        pub fn skip_to_nextline(&mut self) {
+            self.buffer.clear();
+            while self.buffer.is_empty() {
+                self.extend_nextline();
+            }
+        }
+
+        fn extend_nextline(&mut self) {
+            self.reader.read_line(&mut self.sbuf).unwrap();
+            self.buffer
+                .extend(self.sbuf.split_whitespace().map(|s| s.to_owned()).rev());
+            self.sbuf.clear();
+        }
+
+        pub fn next<T: FromStr>(&mut self) -> T {
+            loop {
+                if let Some(s) = self.buffer.pop() {
+                    return s.parse().ok().unwrap();
+                }
+                self.extend_nextline();
+            }
+        }
+
+        pub fn next_str(&mut self) -> String {
+            loop {
+                if let Some(s) = self.buffer.pop() {
+                    return s;
+                }
+                self.extend_nextline();
+            }
+        }
+    }
+}
