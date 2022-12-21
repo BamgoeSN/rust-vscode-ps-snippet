@@ -1,0 +1,28 @@
+const DR: [usize; 4] = [0, 1, 0, !0];
+const DC: [usize; 4] = [1, 0, !0, 0];
+
+fn gen_diriter(r: usize, c: usize, tr: usize, tc: usize) -> impl Iterator<Item = (usize, usize)> {
+    std::iter::zip(DR.iter(), DC.iter())
+        .map(move |(&dr, &dc)| (r.wrapping_add(dr), c.wrapping_add(dc)))
+        .filter(move |&(nr, nc)| nr < tr && nc < tc)
+}
+
+fn gen_torusiter(r: usize, c: usize, tr: usize, tc: usize) -> impl Iterator<Item = (usize, usize)> {
+    std::iter::zip(DR.iter(), DC.iter())
+        .map(move |(&dr, &dc)| (r.wrapping_add(dr), c.wrapping_add(dc)))
+        .map(move |(nr, nc)| {
+            let r = if nr > usize::MAX / 2 {
+                let delta = (usize::MAX - nr) % tr;
+                tr - 1 - delta
+            } else {
+                nr
+            };
+            let c = if nc > usize::MAX / 2 {
+                let delta = (usize::MAX - nc) % tc;
+                tc - 1 - delta
+            } else {
+                nc % tc
+            };
+            (r, c)
+        })
+}
