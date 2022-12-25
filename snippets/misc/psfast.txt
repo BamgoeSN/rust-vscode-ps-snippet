@@ -1,12 +1,12 @@
 #![no_main]
-use std::io::*;
 
 #[no_mangle]
 fn main() -> i32 {
     // FastIO
     use fastio::*;
     let input_str = get_input();
-    let mut sc: Splitter<_> = Splitter::new(input_str, |s| s.split_ascii_whitespace());
+    let mut sc = Splitter::new(input_str, |s| s.split_ascii_whitespace());
+    use std::io::*;
     let stdout = stdout();
     let wr = &mut BufWriter::new(stdout.lock());
 
