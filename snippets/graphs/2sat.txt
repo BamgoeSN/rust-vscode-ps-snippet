@@ -1,49 +1,55 @@
-struct TwoSat {
-    n: u32,
-    graph: Graph<()>,
-}
+mod twosat {
+    use super::{scc::*, *};
 
-impl TwoSat {
-    fn new(n: u32, clause_num: u32) -> Self {
-        Self {
-            n,
-            graph: Graph::new(n << 1, clause_num << 1),
-        }
+    pub struct TwoSat {
+        n: usize,
+        graph: Graph<()>,
     }
 
-    fn judge(f: bool, a: u32, b: u32) -> u32 {
-        if f {
-            a
-        } else {
-            b
-        }
-    }
-
-    fn add_clause(&mut self, i: u32, f: bool, j: u32, g: bool) {
-        self.graph.add_edge(
-            (i << 1) + Self::judge(f, 0, 1),
-            (j << 1) + Self::judge(g, 1, 0),
-            (),
-        );
-        self.graph.add_edge(
-            (j << 1) + Self::judge(g, 0, 1),
-            (i << 1) + Self::judge(f, 1, 0),
-            (),
-        );
-    }
-
-    fn solve(self) -> Option<Vec<bool>> {
-        let mut answer = vec![false; self.n as usize];
-
-        let scc = SCC::new(&self.graph);
-        let ids = &scc.scc_ids;
-
-        for i in 0..self.n {
-            if ids[(i as usize) << 1] == ids[((i as usize) << 1) + 1] {
-                return None;
+    impl TwoSat {
+        pub fn new(n: usize, clause_num: usize) -> Self {
+            Self {
+                n,
+                graph: Graph::new(n << 1, clause_num << 1),
             }
-            answer[i as usize] = ids[(i as usize) << 1] < ids[((i as usize) << 1) + 1];
         }
-        Some(answer)
+
+        fn judge(f: bool, a: usize, b: usize) -> usize {
+            if f {
+                a
+            } else {
+                b
+            }
+        }
+
+        /// Adds a clause ("not" if !f)i or ("not" if !g)j.
+        pub fn add_clause(&mut self, i: usize, f: bool, j: usize, g: bool) {
+            self.graph.add_edge(
+                (i << 1) + Self::judge(f, 0, 1),
+                (j << 1) + Self::judge(g, 1, 0),
+                (),
+            );
+            self.graph.add_edge(
+                (j << 1) + Self::judge(g, 0, 1),
+                (i << 1) + Self::judge(f, 1, 0),
+                (),
+            );
+        }
+
+        pub fn solve(self) -> Option<Vec<bool>> {
+            let mut answer = vec![false; self.n];
+
+            let scc = Scc::new(&self.graph);
+            let ids = scc.get_scc_ids();
+
+            for i in 0..self.n {
+                if ids[i << 1] == ids[(i << 1) + 1] {
+                    return None;
+                }
+                answer[i] = ids[i << 1] < ids[(i << 1) + 1];
+            }
+
+            Some(answer)
+        }
     }
 }
