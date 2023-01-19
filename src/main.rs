@@ -20,9 +20,9 @@ fn main() -> io::Result<()> {
     for (name, mut fp) in files.into_iter() {
         let mut code = String::new();
         let name = name.strip_prefix("./snippets/").unwrap_or(&name);
-        let name = name.strip_suffix(".txt").unwrap_or(&name);
+        let name = name.strip_suffix(".txt").unwrap_or(name);
         fp.read_to_string(&mut code).unwrap();
-        let val = generate_snippet(&name, &code);
+        let val = generate_snippet(name, &code);
         snippet.insert(name.to_owned(), val);
     }
 
