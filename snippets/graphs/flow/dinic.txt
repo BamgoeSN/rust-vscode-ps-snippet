@@ -45,7 +45,7 @@ mod dinic {
             lv[t as usize] != 0
         }
 
-        fn dfs(&mut self, v: u32, t: u32, fl: u64, lv: &mut [u32], idx: &mut [u32]) -> u64 {
+        fn dfs(&mut self, v: u32, t: u32, fl: u64, lv: &[u32], idx: &mut [u32]) -> u64 {
             if v == t || fl == 0 {
                 return fl;
             }
