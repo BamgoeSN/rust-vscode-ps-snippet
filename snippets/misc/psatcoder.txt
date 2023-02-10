@@ -28,7 +28,9 @@ mod fastio {
     extern "C" {}
 
     pub fn get_input() -> &'static str {
-        let buf = io::read_to_string(io::stdin()).unwrap();
+        use io::Read;
+        let mut buf = String::new();
+        io::stdin().read_to_string(&mut buf);
         Box::leak(buf.into_boxed_str())
     }
 
@@ -123,8 +125,13 @@ mod fastio {
         pub fn next_str_ok(&mut self) -> Option<&'t str> {
             self.it.next()
         }
-        pub fn next_iter<T: IterParse>(&mut self) -> impl Iterator<Item = T> + '_ {
-            std::iter::repeat_with(move || self.next_ok().ok()).map_while(|x| x)
+        pub fn next_iter<'s, T: IterParse>(&'s mut self) -> impl Iterator<Item = T> + '_
+        where
+            't: 's,
+        {
+            std::iter::repeat_with(move || self.next_ok())
+                .take_while(|x| x.is_ok())
+                .flatten()
         }
     }
 }
