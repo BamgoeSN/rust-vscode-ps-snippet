@@ -4,7 +4,21 @@ mod dinic {
     use std::collections::VecDeque;
 
     #[derive(Clone)]
-    pub struct Edge(u32, u32, u64);
+    pub struct Edge {
+        pub src: u32,
+        pub opp: u32,
+        pub cap: u64,
+    }
+
+    impl Edge {
+        fn new(src: usize, opp: usize, cap: u64) -> Self {
+            Self {
+                src: src as u32,
+                opp: opp as u32,
+                cap,
+            }
+        }
+    }
 
     pub struct Dinic {
         pub n: usize,
@@ -22,8 +36,8 @@ mod dinic {
         pub fn add_edge(&mut self, s: usize, e: usize, cap: u64) {
             let sl = self.g[s].len();
             let el = self.g[e].len();
-            self.g[s].push(Edge(e as u32, el as u32, cap));
-            self.g[e].push(Edge(s as u32, sl as u32, 0));
+            self.g[s].push(Edge::new(e, el, cap));
+            self.g[e].push(Edge::new(s, sl, 0));
         }
 
         fn bfs(&mut self, s: u32, t: u32, lv: &mut [u32]) -> bool {
@@ -35,9 +49,9 @@ mod dinic {
 
             while let Some(v) = queue.pop_front() {
                 for e in self.g[v as usize].iter() {
-                    if lv[e.0 as usize] == 0 && e.2 != 0 {
-                        queue.push_back(e.0);
-                        lv[e.0 as usize] = lv[v as usize] + 1;
+                    if lv[e.src as usize] == 0 && e.cap != 0 {
+                        queue.push_back(e.src);
+                        lv[e.src as usize] = lv[v as usize] + 1;
                     }
                 }
             }
@@ -53,17 +67,17 @@ mod dinic {
             for i in idx[v as usize]..self.g[v as usize].len() as u32 {
                 idx[v as usize] = i;
 
-                let Edge(e0, e1, e2) = self.g[v as usize][i as usize];
-                if lv[e0 as usize] != lv[v as usize] + 1 || e2 == 0 {
+                let Edge { src, opp, cap } = self.g[v as usize][i as usize];
+                if lv[src as usize] != lv[v as usize] + 1 || cap == 0 {
                     continue;
                 }
-                let now = self.dfs(e0, t, fl.min(e2), lv, idx);
+                let now = self.dfs(src, t, fl.min(cap), lv, idx);
                 if now == 0 {
                     continue;
                 }
 
-                self.g[v as usize][i as usize].2 -= now;
-                self.g[e0 as usize][e1 as usize].2 += now;
+                self.g[v as usize][i as usize].cap -= now;
+                self.g[src as usize][opp as usize].cap += now;
                 return now;
             }
 
