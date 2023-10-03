@@ -26,6 +26,7 @@ mod frac {
 		}
 
 		pub fn new(num: I, den: U) -> Self {
+            assert_ne!(den, 0);
 			Self { num, den }.simplify()
 		}
 
