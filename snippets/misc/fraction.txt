@@ -1,16 +1,24 @@
 mod frac {
+	/// Note: Basic arithmetics on the fraction types do not simplify the fraction to reduce calls of GCD.
+	/// Simplifications should all be done manually.
 	use std::{fmt::Display, ops::*};
 
-	type I = i64;
-	type U = u64;
+	/// Numerator type
+	pub type I = i64;
+	/// Denominator type
+	pub type U = u64;
 
+	/// Fraction type.
 	#[derive(Clone, Copy, Debug)]
 	pub struct Frac {
+		/// Numerator
 		pub num: I,
+		/// Denominator
 		pub den: U,
 	}
 
 	impl Frac {
+		/// Simplifies the fraction to the minimum denomicator.
 		pub fn simplify(self) -> Self {
 			fn gcd(mut a: U, mut b: U) -> U {
 				while b != 0 {
@@ -25,15 +33,21 @@ mod frac {
 			}
 		}
 
-		pub fn new(num: I, den: U) -> Self {
-			assert_ne!(den, 0);
-			Self { num, den }.simplify()
+		/// Returns a fraction from a given numerator and denominator
+		pub fn new(num: I, den: I) -> Self {
+			debug_assert_ne!(den, 0);
+			if den < 0 {
+				Self { num: -num, den: (-den) as U }
+			} else {
+				Self { num, den: den as U }
+			}
 		}
 
+		/// Returns a reciprocal of the fraction
 		pub fn recip(self) -> Self {
 			use std::cmp::Ordering::*;
 			match self.num.cmp(&0) {
-				Less => Self {		
+				Less => Self {
 					num: -(self.den as I),
 					den: (-self.num) as U,
 				},
@@ -45,28 +59,35 @@ mod frac {
 			}
 		}
 
+		/// Returns a floor of the fraction in an integer form
 		pub fn floor(self) -> I {
 			let Self { num, den } = self;
 			let den = den as I;
 			num.div_euclid(den)
 		}
 
+		/// Returns a ceil of the fraction in an integer form
 		pub fn ceil(self) -> I {
 			let Self { num, den } = self;
 			let den = den as I;
 			(num + den - 1).div_euclid(den)
 		}
 
+		/// Returns a rounded fraction in an integer form
 		pub fn round(self) -> I {
 			let Self { num, den } = self;
 			let den = den as I;
 			(2 * num + den).div_euclid(2 * den)
 		}
 
+		/// Returns self - self.floor()
 		pub fn fract(self) -> Self {
 			self - self.floor()
 		}
 
+		/// Returns two closest fractions to `x` given a maximum possible value for denominators.
+		/// If the fraction is equal to `x` when converted to f64, then the both bounds are equal.
+		/// This behavior is subject to change for more accurate approximation.
 		pub fn wrap(x: f64, max_den: U) -> (Self, Self) {
 			let ipart = x.floor() as I;
 			let d = x.fract();
@@ -97,8 +118,8 @@ mod frac {
 				}
 			}
 
-			let l = Self::new(ln as I, ld) + ipart;
-			let r = Self::new(rn as I, rd) + ipart;
+			let l = Self::new(ln as I, ld as I) + ipart;
+			let r = Self::new(rn as I, rd as I) + ipart;
 			if x == l.into() {
 				(l, l)
 			} else if x == r.into() {
@@ -108,6 +129,10 @@ mod frac {
 			}
 		}
 
+		/// Returns two fractions `(l, r)` where `l <= self`, `r >= self`, and `l`, `r` both being
+		/// the closest to `self` given a maximum value of denominators. This function can be
+		/// used for approximating the fraction when the numberator or denominator is getting too
+		/// large, but you don't need an exact value of the fraction.
 		pub fn lower_den(self, max_den: U) -> (Self, Self) {
 			if self.den <= max_den {
 				return (self, self);
@@ -140,8 +165,8 @@ mod frac {
 				}
 			}
 
-			let l = Self::new(ln as I, ld) + ipart;
-			let r = Self::new(rn as I, rd) + ipart;
+			let l = Self::new(ln as I, ld as I) + ipart;
+			let r = Self::new(rn as I, rd as I) + ipart;
 			(l, r)
 		}
 	}
@@ -184,7 +209,6 @@ mod frac {
 				num: self.num * rhs.den as I + self.den as I * rhs.num,
 				den: self.den * rhs.den,
 			}
-			.simplify()
 		}
 	}
 
@@ -195,7 +219,6 @@ mod frac {
 				num: self.num * rhs.den as I - self.den as I * rhs.num,
 				den: self.den * rhs.den,
 			}
-			.simplify()
 		}
 	}
 
@@ -206,7 +229,6 @@ mod frac {
 				num: self.num * rhs.num,
 				den: self.den * rhs.den,
 			}
-			.simplify()
 		}
 	}
 
