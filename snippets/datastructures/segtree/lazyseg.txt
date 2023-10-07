@@ -287,8 +287,8 @@ mod lazyseg {
             for i in (1..=self.log).rev() {
                 self.push(l >> i);
             }
-
             let mut sm = self.e;
+
             loop {
                 l >>= l.trailing_zeros();
                 if !pred((self.op)(sm, self.data[l])) {
@@ -305,7 +305,7 @@ mod lazyseg {
                 }
                 sm = (self.op)(sm, self.data[l]);
                 l += 1;
-                if l & ((!l) + 1) != l {
+                if l & ((!l) + 1) == l {
                     break;
                 }
             }
