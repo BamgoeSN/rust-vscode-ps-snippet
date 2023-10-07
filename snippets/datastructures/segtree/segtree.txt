@@ -42,14 +42,7 @@ mod segtree {
             data.extend(iter.into_iter().take(n));
             data.resize(2 * size, e);
 
-            let mut st = Self {
-                n,
-                data,
-                e,
-                op,
-                size,
-                log,
-            };
+            let mut st = Self { n, data, e, op, size, log };
             for i in (1..size).rev() {
                 st.upd(i);
             }
@@ -226,3 +219,4 @@ mod segtree {
         }
     }
 }
+
