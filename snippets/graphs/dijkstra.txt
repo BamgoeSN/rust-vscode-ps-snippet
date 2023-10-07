@@ -14,20 +14,15 @@ macro_rules! impl_hasnz {
     )* };
 }
 
-use std::num::*;
 impl_hasnz!(i8, NonZeroI8; i16, NonZeroI16; i32, NonZeroI32; i64, NonZeroI64; i128, NonZeroI128; isize, NonZeroIsize);
 impl_hasnz!(u8, NonZeroU8; u16, NonZeroU16; u32, NonZeroU32; u64, NonZeroU64; u128, NonZeroU128; usize, NonZeroUsize);
 
-use std::ops::*;
-fn dijkstra<T>(graph: &Graph<T>, src: usize) -> Vec<Option<T>>
+fn dijkstra<T>(graph: &[Vec<(usize, T)>], src: usize) -> Vec<Option<T>>
 where
     T: Copy + From<u8> + Add<Output = T> + Sub<Output = T> + Eq + Ord + HasNz,
     <T as HasNz>::NzType: Copy,
 {
-    use core::cmp::Reverse;
-    use std::collections::BinaryHeap;
-
-    let mut dist: Vec<Option<T::NzType>> = vec![None; graph.n];
+    let mut dist: Vec<Option<T::NzType>> = vec![None; graph.len()];
     let mut heap: BinaryHeap<(Reverse<T>, usize)> = BinaryHeap::new();
     heap.push((Reverse(1.into()), src));
 
@@ -37,7 +32,7 @@ where
         }
         dist[curr] = curr_cost.into_nz();
 
-        for (next, &weight) in graph.neighbor(curr) {
+        for &(next, weight) in graph[curr].iter() {
             let next_cost = curr_cost + weight;
             if dist[next].map_or(true, |x| T::retrieve(x) > next_cost) {
                 dist[next] = next_cost.into_nz();
@@ -46,7 +41,5 @@ where
         }
     }
 
-    dist.iter()
-        .map(|x| x.map(|x| T::retrieve(x) - 1.into()))
-        .collect()
+    dist.iter().map(|x| x.map(|x| T::retrieve(x) - 1.into())).collect()
 }

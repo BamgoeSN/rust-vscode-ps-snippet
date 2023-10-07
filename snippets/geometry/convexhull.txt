@@ -1,122 +1,44 @@
-#[derive(Clone, Debug, Eq, PartialEq)]
-struct Point {
-    x: i64,
-    y: i64,
-}
+type Point = (i64, i64);
 
-impl Point {
-    fn add(&self, other: &Self) -> Self {
-        Self {
-            x: self.x + other.x,
-            y: self.y + other.y,
-        }
+/// Returns a convex hull of `arr`.
+/// If `COLINEAR` is set to `false`, then every point which lies on a vertex of a convex hull, but not at the endpoints of it, is excluded.
+/// If `COLINEAR` is set to `true`, then such points are all included.
+/// The result is sorted in clockwise direction.
+///
+/// The implementation utilizes monotone-chain convex hull algorithm.
+fn convex_hull<const COLINEAR: bool>(arr: &[Point]) -> Vec<Point> {
+    let mut arr = arr.to_owned();
+    arr.sort_unstable();
+    arr.dedup();
+    if arr.len() <= 1 {
+        return arr.to_vec();
     }
-    fn sub(&self, other: &Self) -> Self {
-        Self {
-            x: self.x - other.x,
-            y: self.y - other.y,
-        }
-    }
-}
+    let mut ret = vec![];
 
-#[derive(Clone, Debug, Eq, PartialEq)]
-enum Turn {
-    CW,
-    CCW,
-    Zero,
-}
-
-fn get_turn(v1: &Point, v2: &Point) -> Turn {
-    let prod = v1.x * v2.y - v1.y * v2.x;
-    if prod > 0 {
-        Turn::CCW
-    } else if prod < 0 {
-        Turn::CW
-    } else {
-        Turn::Zero
-    }
-}
-
-fn compare_ccw(a: &Point, b: &Point) -> core::cmp::Ordering {
-    use core::cmp::Ordering;
-    if a == b {
-        return Ordering::Equal;
-    }
-    if a.x == 0 && a.y == 0 {
-        return Ordering::Less;
-    } else if b.x == 0 && b.y == 0 {
-        return Ordering::Greater;
-    }
-
-    let turn = get_turn(a, b);
-    if turn == Turn::CCW {
-        return Ordering::Less;
-    } else if turn == Turn::CW {
-        return Ordering::Greater;
-    }
-
-    let a_dist = a.x * a.x + a.y * a.y;
-    let b_dist = b.x * b.x + b.y * b.y;
-    a_dist.cmp(&b_dist)
-}
-
-fn convex_hull(arr: &mut [Point]) -> Vec<Point> {
-    let pivot = {
-        let mut pivot = Point {
-            x: i64::MAX,
-            y: i64::MAX,
-        };
-        for v in arr.iter() {
-            if pivot.y > v.y || (pivot.y == v.y && pivot.x > v.x) {
-                pivot.x = v.x;
-                pivot.y = v.y;
+    fn monotone<const COLINEAR: bool>(it: impl Iterator<Item = Point>) -> Vec<Point> {
+        let sub = |(a, b): Point, (c, d): Point| (a - c, b - d);
+        let cross = |(a, b): Point, (c, d): Point| a as i128 * d as i128 - b as i128 * c as i128;
+        let ccw = |a: Point, b: Point, c: Point| cross(sub(b, a), sub(c, b));
+        let mut dl = vec![];
+        for p in it {
+            while dl.len() >= 2 {
+                let n = dl.len();
+                let v = ccw(dl[n - 2], dl[n - 1], p);
+                if v > 0 || (!COLINEAR && v == 0) {
+                    dl.pop();
+                } else {
+                    break;
+                }
             }
+            dl.push(p);
         }
-        pivot
-    };
-
-    for v in arr.iter_mut() {
-        *v = v.sub(&pivot);
+        dl
     }
 
-    arr.sort_unstable_by(compare_ccw);
+    ret.extend(monotone::<COLINEAR>(arr.iter().copied()));
+    ret.pop();
+    ret.extend(monotone::<COLINEAR>(arr.iter().copied().rev()));
+    ret.pop();
 
-    let mut stack = vec![arr[0].clone()];
-    let mut i = 1;
-    while i < arr.len() {
-        if stack.len() == 1 {
-            if arr[i] != stack[0] {
-                stack.push(arr[i].clone());
-            }
-            i += 1;
-            continue;
-        }
-
-        let a = &arr[i];
-        let b = &stack[stack.len() - 1];
-        let c = &stack[stack.len() - 2];
-        match get_turn(&b.sub(c), &a.sub(b)) {
-            Turn::CCW => {
-                stack.push(a.clone());
-                i += 1;
-            }
-            Turn::CW => {
-                stack.pop();
-            }
-            _ => {
-                stack.pop();
-                stack.push(a.clone());
-                i += 1;
-            }
-        }
-    }
-
-    for v in arr.iter_mut() {
-        *v = v.add(&pivot);
-    }
-    for v in stack.iter_mut() {
-        *v = v.add(&pivot);
-    }
-
-    stack
+    ret
 }
