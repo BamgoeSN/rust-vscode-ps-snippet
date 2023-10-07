@@ -63,7 +63,7 @@ mod lazyseg {
             self.lazy[k] = self.id;
         }
 
-        /// Returns a new lazy segment tree of a size `n` built from `iter`.
+        /// Returns a new lazy segment tree of size `n` built from `iter`.
         ///
         /// The meanings of parameters and some generic types are as follows.
         /// - `T` is a type of values in the array the lazy segment tree represents.
@@ -92,7 +92,7 @@ mod lazyseg {
         ///   - `id` must be a proper identity for `F` under `compos`. That is, `f.id.a == id.f.a == f.a` for all `a: T` and `f: F`.
         ///   - IMPORTANT: `map` must satisfy `f.(x*y) == f.x * f.y`.
         ///
-        /// For example, a generic range addition range sum lazy segment tree starting with an array of `vec![0; n]` can be constructed as follows.
+        /// For example, a generic range addition range sum lazy segment tree with every value initialized with `0` and of length `n` can be constructed as follows.
         /// ```no_run
         /// let mut ls = LazySeg::new(
         ///     n,
@@ -156,7 +156,7 @@ mod lazyseg {
             self.data[i]
         }
 
-        /// Changes the value of `i`-th element to that applied with `upd_to`.
+        /// Assign `upd_to(self.get(i))` to the `i`-th element.
         pub fn update(&mut self, i: usize, upd_to: impl Fn(T) -> T) {
             let i = i + self.size;
             for j in (1..=self.log).rev() {
@@ -168,7 +168,7 @@ mod lazyseg {
             }
         }
 
-        /// Returns the product of the elements of the array in `range`.
+        /// Returns the product of elements in `range`.
         pub fn prod(&mut self, range: impl RangeBounds<usize>) -> T {
             let (l, r) = self.get_bounds(range);
 
