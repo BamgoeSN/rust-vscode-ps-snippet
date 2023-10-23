@@ -1,4 +1,4 @@
-type Point = (i64, i64);
+type Point = [i64; 2];
 
 /// Returns a convex hull of `arr`.
 /// If `COLINEAR` is set to `false`, then every point which lies on a vertex of a convex hull, but not at the endpoints of it, is excluded.
@@ -16,8 +16,8 @@ fn convex_hull<const COLINEAR: bool>(arr: &[Point]) -> Vec<Point> {
     let mut ret = vec![];
 
     fn monotone<const COLINEAR: bool>(it: impl Iterator<Item = Point>) -> Vec<Point> {
-        let sub = |(a, b): Point, (c, d): Point| (a - c, b - d);
-        let cross = |(a, b): Point, (c, d): Point| a as i128 * d as i128 - b as i128 * c as i128;
+        let sub = |[a, b]: Point, [c, d]: Point| [a - c, b - d];
+        let cross = |[a, b]: Point, [c, d]: Point| a as i128 * d as i128 - b as i128 * c as i128;
         let ccw = |a: Point, b: Point, c: Point| cross(sub(b, a), sub(c, b));
         let mut dl = vec![];
         for p in it {
