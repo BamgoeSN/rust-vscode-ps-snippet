@@ -1,24 +1,23 @@
-fn sieve(max_val: usize) -> (Vec<bool>, Vec<usize>) {
-    let mut primes = vec![];
-    let mut is_prime = vec![true; max_val + 1];
-    is_prime[0] = false;
-    is_prime[1] = false;
+fn sieve(max_val: usize) -> Vec<usize> {
+	let mut primes = vec![2, 3];
+	let mut is_prime = vec![true; max_val / 3 + 1];
 
-    for i in 2..=max_val {
-        if is_prime[i] {
-            primes.push(i);
-        }
-        for &p in primes.iter() {
-            let v = i * p;
-            if v > max_val {
-                break;
-            }
-            is_prime[v] = false;
-            if i % p == 0 {
-                break;
-            }
-        }
-    }
+	for i in 0..is_prime.len() {
+		let j = 6 * (i / 2) + 5 + (i & 1) * 2;
+		if is_prime[i] {
+			primes.push(j);
+		}
+		for &p in primes[2..].iter() {
+			let v = j * p;
+			if v > max_val {
+				break;
+			}
+			is_prime[(v / 1) / 3 - 1] = false;
+			if j % p == 0 {
+				break;
+			}
+		}
+	}
 
-    (is_prime, primes)
+	primes
 }
