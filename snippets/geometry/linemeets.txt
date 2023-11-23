@@ -1,0 +1,29 @@
+type I = i32;
+type P = [I; 2];
+type L = [P; 2];
+
+fn sub(a: P, b: P) -> P { [a[0] - b[0], a[1] - b[1]] }
+fn cross(a: P, b: P) -> i64 { a[0] as i64 * b[1] as i64 - a[1] as i64 * b[0] as i64 }
+
+/// Returns `true` if `p` and `q` meet, and `false` otherwise.
+fn meets(p: L, q: L) -> bool {
+	let u = cross(sub(p[1], p[0]), sub(q[1], q[0]));
+	let sn = cross(sub(q[0], p[0]), sub(q[1], q[0]));
+	let tn = cross(sub(q[0], p[0]), sub(p[1], p[0]));
+	if u != 0 {
+		let int = if u >= 0 { 0..=u } else { u..=0 };
+		if int.contains(&sn) && int.contains(&tn) {
+			true
+		} else {
+			false
+		}
+	} else {
+		if sn != 0 || tn != 0 {
+			return false;
+		}
+		let (a0, a1) = (p[0].min(p[1]), p[0].max(p[1]));
+		let (b0, b1) = (q[0].min(q[1]), q[0].max(q[1]));
+		let (l, r) = (a0.max(b0), a1.min(b1));
+		l <= r
+	}
+}
