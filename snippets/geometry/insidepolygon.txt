@@ -1,3 +1,6 @@
+/// Returns `None` if `p` is on any vertex of `poly`.
+/// Returns `Some(true)` if `p` is inside `poly`, otherwise `Some(false)`.
+/// The orientation of `poly` doesn't matter.
 fn is_inside(p: P, poly: &[P]) -> Option<bool> {
 	let n = poly.len();
 	let mut it = poly.iter().copied().cycle().peekable();
