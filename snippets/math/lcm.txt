@@ -1,12 +1,4 @@
 fn lcm<T>(x: T, y: T) -> T
-where
-    T: Copy
-        + PartialEq
-        + PartialOrd
-        + core::ops::Rem<Output = T>
-        + core::ops::Div<Output = T>
-        + core::ops::Mul<Output = T>
-        + From<u8>,
-{
+where T: Copy + PartialEq + PartialOrd + Rem<Output = T> + Div<Output = T> + Mul<Output = T> + From<u8> {
     x / gcd(x, y) * y
 }

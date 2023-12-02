@@ -1,7 +1,5 @@
 fn gcd<T>(x: T, y: T) -> T
-where
-    T: Copy + PartialEq + PartialOrd + core::ops::Rem<Output = T> + From<u8>,
-{
+where T: Copy + PartialEq + PartialOrd + Rem<Output = T> + From<u8> {
     if y == 0.into() {
         x
     } else {
