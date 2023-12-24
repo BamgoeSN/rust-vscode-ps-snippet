@@ -1,9 +1,7 @@
-struct RNG {
-	val: u64,
-}
+struct RNG(u64);
 
 impl RNG {
-	fn new(seed: u64) -> Self { Self { val: seed } }
+	fn new(seed: u64) -> Self { Self(seed) }
 	fn rand_seed() -> Self {
 		Self::new(unsafe {
 			let mut x: u64 = 0;
@@ -16,12 +14,12 @@ impl RNG {
 
 	fn next_u64(&mut self) -> u64 {
 		// Samples except for u64::MAX
-		let mut x = self.val;
+		let mut x = self.0;
 		x ^= x << 13;
 		x ^= x >> 7;
 		x ^= x << 17;
-		self.val = x;
-		self.val - 1
+		self.0 = x;
+		self.0 - 1
 	}
 
 	fn gen_range(&mut self, range: impl RangeBounds<u64>) -> u64 {
