@@ -1,6 +1,6 @@
-/// Returns `None` if `p` is on any vertex of `poly`.
-/// Returns `Some(true)` if `p` is inside `poly`, otherwise `Some(false)`.
-/// The orientation of `poly` doesn't matter.
+/// Checks if point `p` is within the polygon `poly`.
+/// Returns `None` for points on edges, `Some(true)` for inside, and `Some(false)` for outside.
+/// `poly` must be a non-self-intersecting polygon. Orientation does not affect the result.
 fn is_inside(p: P, poly: &[P]) -> Option<bool> {
 	let n = poly.len();
 	let mut it = poly.iter().copied().cycle().peekable();
