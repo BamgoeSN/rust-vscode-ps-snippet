@@ -1,93 +1,56 @@
-mod factorization {
-	use super::{millerrabin::Primality, RNG};
-	use std::ops::*;
+use millerrabin::Primality;
 
-	pub trait PollardRho: Primality + From<u8> + PartialOrd + ShrAssign + BitAnd<Output = Self> + Clone {
-		fn rho(self, arr: &mut Vec<Self>, rng: &mut RNG);
-		fn factorize(mut self, rng: &mut RNG) -> Vec<Self> {
-			let mut arr: Vec<Self> = Vec::new();
-			if self <= 1.into() {
-				return arr;
-			}
-			while self.clone() & 1.into() == 0.into() {
-				self >>= 1.into();
-				arr.push(2.into());
-			}
-			self.rho(&mut arr, rng);
-			arr
-		}
+/// Reference: https://github.com/justiceHui/icpc-teamnote/blob/master/code/Math/MillerRabin-PollardRho.cpp
+fn factorize(mut n: u64, rng: &mut RNG) -> Vec<u64> {
+	if n <= 1 {
+		return vec![];
 	}
-
-	macro_rules! impl_pollardrho {
-		($t:ty, $u:ty, $reset:expr) => {
-			impl PollardRho for $t {
-				fn rho(self, arr: &mut Vec<Self>, rng: &mut RNG) {
-					if self <= 1 {
-						return;
-					} else if self.is_prime() {
-						arr.push(self);
-						return;
-					}
-
-					let mut i: u64 = 0;
-					let mut x: $t = (rng.next_u64() % self as u64) as $t;
-					let mut y: $t = x;
-					let mut k: u64 = 2;
-					let mut d: $t;
-					let mut reset_limit: u64 = $reset;
-
-					loop {
-						i += 1;
-						x = (((x as $u * x as $u % self as $u) + (self - 1) as $u) % self as $u) as $t;
-						d = gcd(y.abs_diff(x), self);
-						if d == self || i >= reset_limit {
-							// Reset
-							reset_limit = reset_limit * 3 / 2;
-							i = 0;
-							x = (rng.next_u64() % self as u64) as $t;
-							y = x;
-						}
-						if d != 1 {
-							break;
-						}
-						if i == k {
-							y = x;
-							k <<= 1;
-						}
-					}
-
-					if d != self {
-						d.rho(arr, rng);
-						(self / d).rho(arr, rng);
-						return;
-					}
-
-					let mut i = 3;
-					while i * i <= self {
-						if self % i == 0 {
-							i.rho(arr, rng);
-							(d / i).rho(arr, rng);
-							return;
-						}
-						i += 2;
-					}
-				}
-			}
-		};
+	let mut ret = vec![];
+	while n % 2 == 0 {
+		n /= 2;
+		ret.push(2);
 	}
+	if n.is_prime() {
+		ret.push(n);
+		return ret;
+	}
+	if n == 1 {
+		return ret;
+	}
+	rho(n, rng, &mut ret);
+	ret
+}
 
-	impl_pollardrho!(u8, u16, 100000);
-	impl_pollardrho!(u16, u32, 100000);
-	impl_pollardrho!(u32, u64, 100000);
-	impl_pollardrho!(u64, u128, 100000);
+fn rho(n: u64, rng: &mut RNG, ret: &mut Vec<u64>) {
+	let mulmod = |x: u64, y: u64, c: u64| ((x as u128 * y as u128) % c as u128) as u64;
+	loop {
+		let mut tort = rng.gen_range(2..n);
+		let mut hare = tort;
+		let c = rng.gen_range(1..n);
+		let step = |x: u64| (mulmod(x, x, n) + c) % n;
+		loop {
+			tort = step(tort);
+			hare = step(step(hare));
+			let d = gcd(tort.abs_diff(hare), n);
 
-	pub fn gcd<T>(x: T, y: T) -> T
-	where T: Copy + PartialEq + PartialOrd + core::ops::Rem<Output = T> + From<u8> {
-		if y == 0.into() {
-			x
-		} else {
-			let v = x % y;
-			gcd(y, v)
+			if d == 1 {
+				continue;
+			} else if d == n {
+				break;
+			}
+
+			let a = n / d;
+			if a.is_prime() {
+				ret.push(a);
+			} else {
+				rho(a, rng, ret);
+			}
+			if d.is_prime() {
+				ret.push(d);
+			} else {
+				rho(d, rng, ret);
+			}
+			return;
 		}
 	}
 }
