@@ -6,11 +6,7 @@ fn meets(p: L, q: L) -> bool {
 	let tn = cross(sub(q[0], p[0]), sub(p[1], p[0]));
 	if u != 0 {
 		let int = if u >= 0 { 0..=u } else { u..=0 };
-		if int.contains(&sn) && int.contains(&tn) {
-			true
-		} else {
-			false
-		}
+		int.contains(&sn) && int.contains(&tn)
 	} else {
 		if sn != 0 || tn != 0 {
 			return false;
