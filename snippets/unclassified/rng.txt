@@ -1,0 +1,56 @@
+struct RNG {
+	val: u64,
+}
+
+impl RNG {
+	fn new(seed: u64) -> Self { Self { val: seed } }
+	fn rand_seed() -> Self {
+		Self::new(unsafe {
+			let mut x: u64 = 0;
+			while x == 0 {
+				std::arch::asm!("rdrand rax", out("rax") x);
+			}
+			x
+		})
+	}
+
+	fn next_u64(&mut self) -> u64 {
+		// Samples except for u64::MAX
+		let mut x = self.val;
+		x ^= x << 13;
+		x ^= x >> 7;
+		x ^= x << 17;
+		self.val = x;
+		self.val - 1
+	}
+
+	fn gen_range(&mut self, range: impl RangeBounds<u64>) -> u64 {
+		use Bound::*;
+		let (lb, rb) = (range.start_bound(), range.end_bound());
+		let l = match lb {
+			Included(&a) => a,
+			Excluded(&a) => a + 1,
+			Unbounded => u64::MIN,
+		};
+		let r = match rb {
+			Included(&a) => a,
+			Excluded(&a) => a - 1,
+			Unbounded => u64::MAX,
+		};
+		let len = r - l + 1;
+		loop {
+			let v = self.next_u64();
+			if v < u64::MAX / len * len {
+				return v % len + l;
+			}
+		}
+	}
+
+	fn shuffle<T>(&mut self, arr: &mut [T]) {
+		let n = arr.len();
+		for i in (1..n).rev() {
+			let j = self.gen_range(0..=i as u64) as usize;
+			arr.swap(i, j);
+		}
+	}
+}
