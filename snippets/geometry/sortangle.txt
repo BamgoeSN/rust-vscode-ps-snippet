@@ -1,0 +1,6 @@
+fn angle_cmp(x_axis: P) -> impl Fn(&P, &P) -> Ordering {
+    move |&a, &b| {
+        let ud = |p| cross(p, x_axis) > 0 || (cross(p, x_axis) == 0 && dot(p, x_axis) < 0);
+        ud(a).cmp(&ud(b)).then_with(|| cross(b, a).cmp(&0).then_with(|| dot(a, a).cmp(&dot(b, b))))
+    }
+}
