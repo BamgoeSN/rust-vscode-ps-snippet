@@ -1,0 +1,22 @@
+fn merge_intervals(arr: &[[i64; 2]]) -> Vec<[i64; 2]> {
+    let mut events: Vec<_> = arr
+        .iter()
+        .flat_map(|&[l, r]| [(l, false), (r, true)])
+        .collect();
+    events.sort_unstable();
+
+    let mut ret = vec![];
+    let mut mark = 0;
+    let mut overlap = 0;
+    for &(x, st) in &events {
+        if overlap == 0 {
+            mark = x;
+        }
+        overlap += 1 - 2 * (st as i64);
+        if overlap == 0 {
+            ret.push([mark, x]);
+        }
+    }
+
+    ret
+}
