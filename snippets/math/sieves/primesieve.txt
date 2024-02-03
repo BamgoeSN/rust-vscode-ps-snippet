@@ -1,23 +1,25 @@
+/// Returns a vector of primes up to `max_val`.
 fn sieve(max_val: usize) -> Vec<usize> {
-	let mut primes = vec![2, 3];
-	let mut is_prime = vec![true; max_val / 3 + 1];
+    let mut primes = vec![2, 3];
+    let mut is_prime = vec![true; max_val / 3 + 1];
 
-	for i in 0..is_prime.len() {
-		let j = 6 * (i >> 1) + 5 + ((i & 1) << 1);
-		if is_prime[i] {
-			primes.push(j);
-		}
-		for &p in primes[2..].iter() {
-			let v = j * p;
-			if v > max_val {
-				break;
-			}
-			is_prime[v / 3 - 1] = false;
-			if j % p == 0 {
-				break;
-			}
-		}
-	}
+    for i in 0..is_prime.len() {
+        let j = 6 * (i >> 1) + 5 + ((i & 1) << 1);
+        if is_prime[i] {
+            primes.push(j);
+        }
+        for &p in primes[2..].iter() {
+            let v = j * p;
+            if v > max_val {
+                break;
+            }
+            is_prime[v / 3 - 1] = false;
+            if j % p == 0 {
+                break;
+            }
+        }
+    }
 
-	primes
+    primes.retain(|&x| x <= max_val);
+    primes
 }
